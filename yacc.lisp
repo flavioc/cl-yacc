@@ -1064,9 +1064,11 @@ Handle YACC-PARSE-ERROR to provide custom error reporting."
              (or (cdr (assoc a (aref goto-array i)))
                  (error "This cannot happen."))))
       (let ((stack (list 0)) symbol value)
-        (flet ((next-symbol ()
+        (labels ((next-symbol ()
                  (multiple-value-bind (s v) (funcall lexer)
-                   (setq symbol (or s 'yacc-eof-symbol) value v))))
+									(if (eq s :comment)
+									 	(next-symbol)
+                   	(setq symbol (or s 'yacc-eof-symbol) value v)))))
           (next-symbol)
           (loop
            (let* ((state (car stack))
